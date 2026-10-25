@@ -3,37 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memento Cost Calculator</title>
+    <title>Memento Cost Calculator - Hanicraft</title>
+    
+    <!-- App Meta & Mobile Web App Settings -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Hanicraft Calc">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Hanicraft%20Memento%20Calculator%22%2C%22short_name%22%3A%22Hanicraft%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-3 sm:p-6">
+<body class="bg-slate-900 text-slate-100 min-h-screen p-3 sm:p-6 select-none">
 
     <div class="max-w-3xl mx-auto space-y-4">
         
-        <!-- Header -->
-        <header class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 pb-1 border-b border-slate-800">
-            <div class="w-full sm:w-auto flex justify-center sm:justify-start">
+        <!-- Header with Original Logo -->
+        <header class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div class="flex items-center gap-3">
                 <img src="https://hanicraft.in/web/assets/images/logo/logo.png" 
                      alt="Hanicraft Logo" 
-                     class="h-12 sm:h-14 w-auto object-contain brightness-0 invert"
-                     onerror="this.src='https://placehold.co/180x50/0f172a/ffffff?text=HANICRAFT'">
+                     class="h-8 sm:h-10 w-auto object-contain brightness-0 invert opacity-90"
+                     onerror="this.style.display='none'; document.getElementById('altLogoText').classList.remove('hidden');">
+                <div id="altLogoText" class="hidden">
+                    <span class="text-base font-extrabold tracking-wider text-white uppercase">HANICRAFT</span>
+                    <span class="text-[10px] text-amber-400 font-bold block tracking-widest uppercase">Memento Costing</span>
+                </div>
             </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="toggleSettings()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition touch-manipulation">
-                    <i class="fa-solid fa-sliders text-amber-400 mr-1.5"></i> Rates & Materials
+                <button onclick="toggleSettings()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition touch-manipulation flex items-center gap-1.5">
+                    <i class="fa-solid fa-sliders text-amber-400"></i> Rates & Materials
                 </button>
             </div>
         </header>
 
-        <!-- Product Reference -->
+        <!-- Product Reference Input -->
         <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3">
-            <input type="text" id="productName" placeholder="Product Ref / Name (e.g. Executive Wooden Shield)" oninput="calculate()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-amber-500">
+            <input type="text" id="productName" placeholder="Product Ref / Name (e.g. Executive Wooden Shield)" oninput="saveCurrentSessionData(); calculate();" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-amber-500">
         </div>
 
         <!-- Master Rates & Settings Panel -->
@@ -83,7 +98,7 @@
                 <div class="space-y-2 text-xs">
                     <div>
                         <label class="block text-slate-400 mb-1">Material Name</label>
-                        <input type="text" id="modalMaterialName" placeholder="e.g. Metal, Composite Board" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none">
+                        <input type="text" id="modalMaterialName" placeholder="e.g. Composite Board, Brass" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:outline-none">
                     </div>
                 </div>
                 <div class="flex justify-end gap-2 pt-2 border-t border-slate-800 text-xs font-semibold">
@@ -166,7 +181,9 @@
                 <!-- Materials Block Container -->
                 <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3.5 space-y-3">
                     <div class="flex items-center justify-between pb-1 border-b border-slate-700/50">
-                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Materials & Layers</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-layer-group"></i> Materials & Layers
+                        </span>
                     </div>
 
                     <div id="dynamicMaterialsContainer" class="space-y-2.5"></div>
@@ -178,7 +195,7 @@
                     
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
                         
-                        <!-- Paint/Polish Selection & Cost (Conditioned by Wood selection) -->
+                        <!-- Paint/Polish Selection & Cost -->
                         <div id="paintContainerCard" class="col-span-2 sm:col-span-3 bg-slate-900/80 p-2 rounded-lg border border-slate-700/60 grid grid-cols-12 gap-2">
                             <div class="col-span-7 sm:col-span-8">
                                 <div class="flex justify-between items-center mb-0.5">
@@ -195,7 +212,7 @@
                             </div>
                             <div class="col-span-5 sm:col-span-4">
                                 <label class="text-[10px] text-slate-400 block mb-0.5">Paint Cost (₹)</label>
-                                <input type="number" id="paintCost" value="0" oninput="calculate(false, false, false, true)" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none" title="Auto calculated based on wood area, manual entry allowed">
+                                <input type="number" id="paintCost" value="0" oninput="saveCurrentSessionData(); calculate(false, false, false, true);" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none" title="Auto calculated based on wood area, manual entry allowed">
                             </div>
                         </div>
 
@@ -205,7 +222,7 @@
                                 <label class="text-[10px] text-slate-400 block">Wood CNC Cut (₹)</label>
                                 <span id="autoCncBadge" class="text-[8px] font-bold text-amber-400 bg-amber-950 px-1 rounded">Auto</span>
                             </div>
-                            <input type="number" id="cncCost" value="0" oninput="calculate(false, false, true)" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none" title="Auto calculated from selected wood thickness">
+                            <input type="number" id="cncCost" value="0" oninput="saveCurrentSessionData(); calculate(false, false, true);" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none" title="Auto calculated from selected wood thickness">
                         </div>
 
                         <div id="laserCutCostCard" class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60">
@@ -213,24 +230,24 @@
                                 <label class="text-[10px] text-slate-400 block">Acrylic Laser Cut (₹)</label>
                                 <span id="autoLaserBadge" class="text-[8px] font-bold text-amber-400 bg-amber-950 px-1 rounded">Auto</span>
                             </div>
-                            <input type="number" id="laserCutCost" value="0" oninput="calculate(false, true, false)" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none" title="Auto calculated from selected acrylic thickness">
+                            <input type="number" id="laserCutCost" value="0" oninput="saveCurrentSessionData(); calculate(false, true, false);" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none" title="Auto calculated from selected acrylic thickness">
                         </div>
 
                         <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60">
                             <label class="text-[10px] text-slate-400 block mb-0.5">Print (₹)</label>
-                            <input type="number" id="printCost" value="0" oninput="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none">
+                            <input type="number" id="printCost" value="0" oninput="saveCurrentSessionData(); calculate();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none">
                         </div>
                         <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60">
                             <label class="text-[10px] text-slate-400 block mb-0.5">Laser Engrave (₹)</label>
-                            <input type="number" id="laserCost" value="0" oninput="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none">
+                            <input type="number" id="laserCost" value="0" oninput="saveCurrentSessionData(); calculate();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none">
                         </div>
                         <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60">
                             <label class="text-[10px] text-slate-400 block mb-0.5">Labor (₹)</label>
-                            <input type="number" id="laborCost" value="0" oninput="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none">
+                            <input type="number" id="laborCost" value="0" oninput="saveCurrentSessionData(); calculate();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none">
                         </div>
                         <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60">
                             <label class="text-[10px] text-slate-400 block mb-0.5">Box/Other (₹)</label>
-                            <input type="number" id="otherCost" value="0" oninput="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none">
+                            <input type="number" id="otherCost" value="0" oninput="saveCurrentSessionData(); calculate();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-white focus:outline-none">
                         </div>
 
                         <!-- Quantity Selector -->
@@ -245,7 +262,7 @@
                                 <label class="text-[10px] text-slate-400 block">Profit (%)</label>
                                 <span id="autoProfitBadge" class="text-[9px] font-semibold text-emerald-400 bg-emerald-950 px-1 rounded">Auto</span>
                             </div>
-                            <input type="number" id="profitMargin" value="200" oninput="calculate(true)" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-emerald-400 focus:outline-none" title="Manual profit entry allowed">
+                            <input type="number" id="profitMargin" value="200" oninput="saveCurrentSessionData(); calculate(true);" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 font-semibold text-emerald-400 focus:outline-none" title="Manual profit entry allowed">
                         </div>
                     </div>
                 </div>
@@ -323,18 +340,21 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'memento_material_rates_v15_layers';
+        const STORAGE_KEY = 'memento_material_rates_v16_persist';
+        const SESSION_STATE_KEY = 'memento_calc_active_session_v1';
+
         let materialRates = loadSavedRates();
 
-        // Active material instances in calculation area
+        // Default initial layers
         let activeMaterialInstances = [
             { instanceId: 'inst_wood_1', matId: 'wood', subcatId: 'rubwood', thicknessId: 'rw_8mm', w: 8, h: 10, checked: true },
             { instanceId: 'inst_acrylic_1', matId: 'acrylic', subcatId: 'clear_acrylic', thicknessId: 'a_3mm', w: 8, h: 10, checked: true }
         ];
 
+        // Persistence API lock
         if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().then(granted => {
-                if (granted) console.log("Storage persistence active");
+                if (granted) console.log("Persistent local storage enabled.");
             });
         }
 
@@ -352,7 +372,71 @@
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(materialRates));
             } catch (e) {
-                console.error('LocalStorage save failed!', e);
+                console.error('LocalStorage master save failed!', e);
+            }
+        }
+
+        function saveCurrentSessionData() {
+            try {
+                const sessionData = {
+                    productName: document.getElementById('productName')?.value || '',
+                    instances: activeMaterialInstances,
+                    paintType: document.getElementById('paintTypeSelect')?.value || 'none',
+                    paintCost: document.getElementById('paintCost')?.value || 0,
+                    cncCost: document.getElementById('cncCost')?.value || 0,
+                    laserCutCost: document.getElementById('laserCutCost')?.value || 0,
+                    printCost: document.getElementById('printCost')?.value || 0,
+                    laserCost: document.getElementById('laserCost')?.value || 0,
+                    laborCost: document.getElementById('laborCost')?.value || 0,
+                    otherCost: document.getElementById('otherCost')?.value || 0,
+                    itemQuantity: document.getElementById('itemQuantity')?.value || 1,
+                    profitMargin: document.getElementById('profitMargin')?.value || 200,
+                    badges: {
+                        autoProfit: !document.getElementById('autoProfitBadge')?.classList.contains('hidden'),
+                        autoPaint: !document.getElementById('autoPaintBadge')?.classList.contains('hidden'),
+                        autoLaser: !document.getElementById('autoLaserBadge')?.classList.contains('hidden'),
+                        autoCnc: !document.getElementById('autoCncBadge')?.classList.contains('hidden')
+                    }
+                };
+                localStorage.setItem(SESSION_STATE_KEY, JSON.stringify(sessionData));
+            } catch (e) {
+                console.warn('Could not save session state', e);
+            }
+        }
+
+        function loadSessionData() {
+            try {
+                const savedSession = localStorage.getItem(SESSION_STATE_KEY);
+                if (savedSession) {
+                    const data = JSON.parse(savedSession);
+                    if (data && Array.isArray(data.instances) && data.instances.length > 0) {
+                        activeMaterialInstances = data.instances;
+                        
+                        setTimeout(() => {
+                            if (document.getElementById('productName')) document.getElementById('productName').value = data.productName || '';
+                            if (document.getElementById('paintTypeSelect')) document.getElementById('paintTypeSelect').value = data.paintType || 'none';
+                            if (document.getElementById('paintCost')) document.getElementById('paintCost').value = data.paintCost || 0;
+                            if (document.getElementById('cncCost')) document.getElementById('cncCost').value = data.cncCost || 0;
+                            if (document.getElementById('laserCutCost')) document.getElementById('laserCutCost').value = data.laserCutCost || 0;
+                            if (document.getElementById('printCost')) document.getElementById('printCost').value = data.printCost || 0;
+                            if (document.getElementById('laserCost')) document.getElementById('laserCost').value = data.laserCost || 0;
+                            if (document.getElementById('laborCost')) document.getElementById('laborCost').value = data.laborCost || 0;
+                            if (document.getElementById('otherCost')) document.getElementById('otherCost').value = data.otherCost || 0;
+                            if (document.getElementById('itemQuantity')) document.getElementById('itemQuantity').value = data.itemQuantity || 1;
+                            if (document.getElementById('profitMargin')) document.getElementById('profitMargin').value = data.profitMargin || 200;
+
+                            if (data.badges) {
+                                if (data.badges.autoProfit === false) document.getElementById('autoProfitBadge')?.classList.add('hidden');
+                                if (data.badges.autoPaint === false) document.getElementById('autoPaintBadge')?.classList.add('hidden');
+                                if (data.badges.autoLaser === false) document.getElementById('autoLaserBadge')?.classList.add('hidden');
+                                if (data.badges.autoCnc === false) document.getElementById('autoCncBadge')?.classList.add('hidden');
+                            }
+                            calculate();
+                        }, 50);
+                    }
+                }
+            } catch (e) {
+                console.warn('Fallback loading session data', e);
             }
         }
 
@@ -484,12 +568,14 @@
             }
 
             renderDynamicMaterials();
+            saveCurrentSessionData();
             calculate();
         }
 
         function removeMaterialInstance(instanceId) {
             activeMaterialInstances = activeMaterialInstances.filter(i => i.instanceId !== instanceId);
             renderDynamicMaterials();
+            saveCurrentSessionData();
             calculate();
         }
 
@@ -520,14 +606,16 @@
                             <input type="checkbox" id="chk_${inst.instanceId}" ${inst.checked ? 'checked' : ''} onchange="updateInstanceChecked('${inst.instanceId}')" class="rounded bg-slate-800 border-slate-700 text-amber-500 focus:ring-amber-500">
                             <i class="fa-solid ${mat.icon || 'fa-cubes'} text-amber-400"></i> ${mat.name} #${index + 1}
                         </label>
-                        <div class="flex items-center gap-2">
-                            <span id="subtotal_${inst.instanceId}" class="text-xs font-bold text-amber-400">₹0.00</span>
-                            <button type="button" onclick="addMaterialInstance('${inst.matId}', '${inst.instanceId}')" class="text-emerald-400 hover:text-emerald-300 text-xs px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded transition flex items-center gap-1" title="Add Layer Below">
-                                <i class="fa-solid fa-plus text-[10px]"></i>
+                        <div class="flex items-center gap-1.5">
+                            <span id="subtotal_${inst.instanceId}" class="text-xs font-bold text-amber-400 mr-1">₹0.00</span>
+                            <button type="button" onclick="addMaterialInstance('${inst.matId}', '${inst.instanceId}')" class="text-emerald-400 hover:text-emerald-300 text-xs px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition flex items-center gap-1 font-semibold" title="Add Layer Below">
+                                <i class="fa-solid fa-plus text-[10px]"></i> Layer
                             </button>
-                            <button type="button" onclick="removeMaterialInstance('${inst.instanceId}')" class="text-rose-400 hover:text-rose-300 text-xs px-1.5 py-0.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded transition flex items-center gap-1" title="Delete Layer">
-                                <i class="fa-solid fa-trash-can text-[10px]"></i>
-                            </button>
+                            ${activeMaterialInstances.length > 1 ? `
+                                <button type="button" onclick="removeMaterialInstance('${inst.instanceId}')" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition flex items-center gap-1" title="Delete Layer">
+                                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
 
@@ -573,6 +661,7 @@
             if (inst) {
                 inst.checked = document.getElementById(`chk_${instanceId}`)?.checked || false;
             }
+            saveCurrentSessionData();
             calculate();
         }
 
@@ -582,6 +671,7 @@
                 inst.w = parseFloat(document.getElementById(`w_${instanceId}`)?.value) || 0;
                 inst.h = parseFloat(document.getElementById(`h_${instanceId}`)?.value) || 0;
             }
+            saveCurrentSessionData();
             calculate();
         }
 
@@ -591,6 +681,7 @@
                 inst.subcatId = document.getElementById(`subcat_${instanceId}`)?.value;
             }
             populateThicknessDropdown(instanceId);
+            saveCurrentSessionData();
             calculate();
         }
 
@@ -599,6 +690,7 @@
             if (inst) {
                 inst.thicknessId = document.getElementById(`thickness_${instanceId}`)?.value;
             }
+            saveCurrentSessionData();
             calculate();
         }
 
@@ -764,7 +856,6 @@
 
         function submitAddMaterial() {
             const matName = document.getElementById('modalMaterialName').value.trim();
-
             if (!matName) return;
 
             const matId = `mat_${Date.now()}`;
@@ -784,7 +875,6 @@
             document.getElementById('modalMaterialName').value = '';
             saveRates();
 
-            // Automatically add an active layer instance for the newly created material
             addMaterialInstance(matId);
 
             renderSettingsPanel();
@@ -855,6 +945,7 @@
             saveRates();
             renderDynamicMaterials();
             renderSettingsPanel();
+            saveCurrentSessionData();
             calculate();
         }
 
@@ -867,6 +958,7 @@
             saveRates();
             renderDynamicMaterials();
             renderSettingsPanel();
+            saveCurrentSessionData();
             calculate();
         }
 
@@ -880,11 +972,16 @@
             saveRates();
             renderSettingsPanel();
             renderDynamicMaterials();
+            saveCurrentSessionData();
             calculate();
         }
 
         function exportDataToFile() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(materialRates, null, 2));
+            const fullBackup = {
+                materialRates: materialRates,
+                session: JSON.parse(localStorage.getItem(SESSION_STATE_KEY) || '{}')
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullBackup, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
             downloadAnchor.setAttribute("download", `hanicraft_memento_rates_backup_${Date.now()}.json`);
@@ -901,18 +998,19 @@
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
-                    if (parsed && Array.isArray(parsed.materials)) {
+                    if (parsed.materialRates) {
+                        materialRates = parsed.materialRates;
+                        if (parsed.session) localStorage.setItem(SESSION_STATE_KEY, JSON.stringify(parsed.session));
+                    } else if (parsed && Array.isArray(parsed.materials)) {
                         materialRates = parsed;
-                        saveRates();
-                        renderDynamicMaterials();
-                        renderSettingsPanel();
-                        calculate();
-                        alert('Backup imported successfully!');
-                    } else {
-                        alert('Invalid backup file structure.');
                     }
+                    saveRates();
+                    renderDynamicMaterials();
+                    renderSettingsPanel();
+                    loadSessionData();
+                    calculate();
                 } catch (err) {
-                    alert('Error parsing backup file.');
+                    console.error('Error importing JSON', err);
                 }
             };
             reader.readAsText(file);
@@ -940,11 +1038,13 @@
             const autoProfit = getAutoProfitPercentage(qty);
             document.getElementById('profitMargin').value = autoProfit;
             document.getElementById('autoProfitBadge').classList.remove('hidden');
+            saveCurrentSessionData();
             calculate();
         }
 
         function onPaintTypeChange() {
             document.getElementById('autoPaintBadge').classList.remove('hidden');
+            saveCurrentSessionData();
             calculate();
         }
 
@@ -1030,7 +1130,7 @@
                 }
             });
 
-            // Dynamic visibility of processing cards based on checked materials
+            // Dynamic visibility of processing cards
             const cncCard = document.getElementById('cncCostCard');
             const laserCard = document.getElementById('laserCutCostCard');
             const paintCard = document.getElementById('paintContainerCard');
@@ -1180,7 +1280,7 @@
         window.onload = function() {
             renderDynamicMaterials();
             renderSettingsPanel();
-            onQuantityChange();
+            loadSessionData();
         };
     </script>
 </body>
